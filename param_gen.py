@@ -11,9 +11,9 @@ def param_array(factors, resolution, level_index):
 
     return fac_matrix
 
-# fac_matrix = pyfac.fracfact_by_res(32, 9)
-# fac_matrix_mean = np.mean(fac_matrix, axis=0)
-# print(fac_matrix_mean)
+# fac_matrix = pyfac.fracfact_by_res(32, 3)[:4]
+# # fac_matrix_mean = np.mean(fac_matrix, axis=0)
+# print(fac_matrix.shape)
 
 # import matplotlib.pyplot as plt
 

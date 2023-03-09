@@ -5,13 +5,14 @@ if __name__ == '__main__':
     from param_gen import param_array
 
     FACTORS = 32
-    RESOLUTION = 9
+    RESOLUTION = 9 # In full study 9
     LEVELS = pd.read_csv('levels.csv')
 
-    devices = param_array(FACTORS, RESOLUTION, LEVELS)
-    pool = mp.Pool()
+    devices = param_array(FACTORS, RESOLUTION, LEVELS)[:4] # cap on processes
+    pool = mp.Pool(maxtasksperchild=1)
     results = [pool.apply(run_im, args=([device])) for device in devices]
     pool.close()
+    pool.join()
     print(results)
 
 
