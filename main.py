@@ -1,34 +1,26 @@
 if __name__ == '__main__':
+    import numpy as np
     import pandas as pd
     import multiprocessing as mp
     from matlab_box import run_im
     from param_gen import param_array
 
+    
+    PATH = r'C:\Users\mvc28\OneDrive - University of Bath\work\IonMonger'
     FACTORS = 32
-    RESOLUTION = 9 # In full study 9
+    RESOLUTION = 9
     LEVELS = pd.read_csv('levels.csv')
 
     devices = param_array(FACTORS, RESOLUTION, LEVELS)[:4] # cap on processes
-    pool = mp.Pool(maxtasksperchild=1)
-    results = [pool.apply(run_im, args=([device])) for device in devices]
-    pool.close()
-    pool.join()
-    print(results)
 
+    with mp.Pool(processes=4) as pool:
+        async_results = [pool.apply_async(run_im, (device, PATH)) for device in devices]
+        results = [None] * len(async_results)
+        for index, res in enumerate(async_results):
+            try:
+                results[index] = res.get(timeout=120)
+            except:
+                results[index] = "timeout"
 
-# from matlab_box import run_im
-# from param_gen import param_array
-
-# FACTORS = 32
-# RESOLUTION = 9
-# LEVELS = 'levels.csv'
-
-# devices = param_array(FACTORS, RESOLUTION, LEVELS)
-
-# def device_loop(devices):
-#     for i in range(len(devices)):
-#         device = devices[i]
-#         jv = run_im(device)
-#         print(jv)
-
-# device_loop(devices)
+    results = np.asarray(results, dtype=object)
+    np.savetxt('results.csv', results, delimiter=',')
