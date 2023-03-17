@@ -1,30 +1,32 @@
 if __name__ == '__main__':
     import json
-    import numpy as np
+    import traceback
     import pandas as pd
     import multiprocessing as mp
     from matlab_box import run_im
     from param_gen import param_array
 
     
-    PATH = r'C:\Users\mvc28\OneDrive - University of Bath\work\IonMonger'
+    PATH = r'C:\Users\matth\OneDrive - University of Bath\work\IonMonger'
+    PROCESSES = 6
     FACTORS = 32
     RESOLUTION = 9
     LEVELS = pd.read_csv('levels.csv')
 
-    devices = param_array(FACTORS, RESOLUTION, LEVELS)[:4] # cap on processes
+    devices = param_array(FACTORS, RESOLUTION, LEVELS) # cap on processes
 
-    with mp.Pool(processes=4) as pool:
+    with mp.Pool(processes=PROCESSES) as pool:
         async_results = [pool.apply_async(run_im, (device, PATH)) for device in devices]
-        results = [None] * len(async_results)
         for index, res in enumerate(async_results):
             try:
-                results[index] = res.get(timeout=120)
-            except:
-                results[index] = "timeout"
+                result = res.get(timeout=120)
+                py_result = {}
+                for key in result.keys():
+                        py_result[key] = [i for i in result[key]._data]
+            except TimeoutError:
+                py_result = "timeout"
+            except Exception:
+                 py_result = traceback.format_exc()
 
-    def default_json(t):
-        return f'{t}'
-
-    with open('output/results.txt', 'w') as result_file:
-        result_file.write(json.dumps(results, default=default_json))
+            with open(f'output/device_{index}.txt', 'w') as result_file:
+                    result_file.write(json.dumps(py_result))
