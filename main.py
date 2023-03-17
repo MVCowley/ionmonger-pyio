@@ -1,4 +1,5 @@
 if __name__ == '__main__':
+    import json
     import numpy as np
     import pandas as pd
     import multiprocessing as mp
@@ -22,5 +23,8 @@ if __name__ == '__main__':
             except:
                 results[index] = "timeout"
 
-    results = np.asarray(results, dtype=object)
-    np.savetxt('results.csv', results, delimiter=',')
+    def default_json(t):
+        return f'{t}'
+
+    with open('output/results.txt', 'w') as result_file:
+        result_file.write(json.dumps(results, default=default_json))
