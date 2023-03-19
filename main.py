@@ -7,8 +7,8 @@ if __name__ == '__main__':
     from param_gen import param_array
 
     
-    PATH = r'C:\Users\matth\OneDrive - University of Bath\work\IonMonger'
-    PROCESSES = 6
+    PATH = r'/home/mvc28/ionmonger-simulations/IonMonger'
+    PROCESSES = 8
     FACTORS = 32
     RESOLUTION = 9
     LEVELS = pd.read_csv('levels.csv')
@@ -21,9 +21,13 @@ if __name__ == '__main__':
             try:
                 result = res.get(timeout=120)
                 py_result = {}
-                for key in result.keys():
-                        py_result[key] = [i for i in result[key]._data]
-                print(f'Device {index} solved by IM')
+                if type(result) is str:
+                     py_result = result
+                     print(f'MATLAB error for device {index}, check output for traceback')
+                else:
+                    for key in result.keys():
+                            py_result[key] = [i for i in result[key]._data]
+                    print(f'Device {index} solved by IM')
             except TimeoutError:
                 py_result = "timeout"
                 print(f'Device {index} timed out')
@@ -31,5 +35,5 @@ if __name__ == '__main__':
                  py_result = traceback.format_exc()
                  print(f'Device {index} threw an error, check output for traceback')
 
-            with open(f'output/device_{index}.txt', 'w') as result_file:
+            with open(f'/home/mvc28/ionmonger-simulations/data/steady_state/dark_static_jv/device_{index}.txt', 'w') as result_file:
                     result_file.write(json.dumps(py_result))

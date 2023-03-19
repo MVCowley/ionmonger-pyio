@@ -1,12 +1,14 @@
+import traceback
 import matlab.engine
 
 def run_im(device, path):
     eng = matlab.engine.start_matlab()
     eng.cd(path)
     try:
-        sol = eng.master_func(device)
+        matlab_device = matlab.double(device.tolist())
+        sol = eng.master_func(matlab_device)
         jv = eng.export_single_jv(sol)
         return jv
-    except:
+    except Exception:
         print('Something went wrong')
-        return 'Exception error'
+        return traceback.format_exc()
