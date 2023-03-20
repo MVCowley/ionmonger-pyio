@@ -1,0 +1,4 @@
+matlabengineforpython===R2020b
+numpy==1.19.5
+pandas==1.1.5
+pyDOE2==1.3.0
