@@ -8,12 +8,13 @@ if __name__ == '__main__':
 
     
     PATH = r'/home/mvc28/ionmonger-simulations/IonMonger'
-    PROCESSES = 8
-    FACTORS = 32
-    RESOLUTION = 9
-    LEVELS = pd.read_csv('levels.csv')
+    PROCESSES = 16
+    # FACTORS = 32
+    # RESOLUTION = 9
+    # LEVELS = pd.read_csv('levels.csv')
 
-    devices = param_array(FACTORS, RESOLUTION, LEVELS)
+    devices_pd = pd.read_csv('analysis_devices.csv')
+    devices = devices_pd.to_numpy()[:, 1:]
 
     with mp.Pool(processes=PROCESSES) as pool:
         async_results = [pool.apply_async(run_im, (device, PATH)) for device in devices]
@@ -35,5 +36,5 @@ if __name__ == '__main__':
                  py_result = traceback.format_exc()
                  print(f'Device {index} threw an error, check output for traceback')
 
-            with open(f'/home/mvc28/ionmonger-simulations/data/steady_state/dark_static_jv/device_{index}.txt', 'w') as result_file:
+            with open(f'/home/mvc28/ionmonger-simulations/data/steady_state/device_subset_light_static/device_{index}.txt', 'w') as result_file:
                     result_file.write(json.dumps(py_result))
